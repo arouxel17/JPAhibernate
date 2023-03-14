@@ -1,5 +1,7 @@
 package com.wildcodeschool.wildandwizard.controller;
 
+import java.util.Optional;
+
 import com.wildcodeschool.wildandwizard.entity.School;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,18 +29,22 @@ public class SchoolController {
     public String getSchool(Model model,
                             @RequestParam(required = false) Long id) {
 
-        School school = new School();
+         School school = new School();
         if (id != null) {
-            school = repository.findById(id).get();
+            Optional<School> optionalSchool = repository.findById(id);
+            if (optionalSchool.isPresent()) {
+                school = optionalSchool.get();
+            }
         }
         model.addAttribute("school", school);
+
         return "school";
     }
 
     @PostMapping("/school")
     public String postSchool(@ModelAttribute School school) {
 
-        // TODO : save school
+        repository.save(school);
         
 
         return "redirect:/schools";
@@ -47,7 +53,7 @@ public class SchoolController {
     @GetMapping("/school/delete")
     public String deleteSchool(@RequestParam Long id) {
 
-        // TODO : delete a school
+        repository.deleteById(id);
 
         return "redirect:/schools";
     }
